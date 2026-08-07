@@ -9,7 +9,9 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
-const DB_PATH = path.join(__dirname, 'database.sqlite');
+const DATA_DIR = path.join(__dirname, 'data');
+if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+const DB_PATH = path.join(DATA_DIR, 'database.sqlite');
 
 // Asegurar que exista el directorio de uploads
 if (!fs.existsSync(UPLOADS_DIR)) {
