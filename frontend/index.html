@@ -5,24 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Verificación de Ubicación</title>
   <style>
-    body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
-    video { width: 100%; max-width: 480px; background: #000; }
-    button { padding: 0.6rem 1.2rem; font-size: 1rem; margin: 0.5rem 0; }
-    input { padding: 0.5rem; width: 100%; box-sizing: border-box; font-size: 1rem; }
+    body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; text-align: center; }
+    video { width: 100%; max-width: 480px; background: #000; margin: 1rem 0; }
+    button { padding: 0.8rem 1.5rem; font-size: 1.1rem; margin: 0.5rem; cursor: pointer; }
+    input { padding: 0.5rem; width: 80%; max-width: 300px; font-size: 1rem; }
     .error { color: red; }
     .success { color: green; }
+    .buttons { margin: 1rem 0; }
   </style>
 </head>
 <body>
-  <h1>Verificación</h1>
+  <h1>Checador de Asistencia</h1>
   <label for="name">Tu nombre:</label>
+  <br>
   <input type="text" id="name" placeholder="Escribe tu nombre" required>
-  <br><br>
+  <br>
   <video id="preview" autoplay muted></video>
   <br>
-  <button id="startBtn">Grabar 3 segundos</button>
+  <div class="buttons">
+    <button id="btnEntrada">🔵 Checar Entrada</button>
+    <button id="btnSalida">🔴 Checar Salida</button>
+  </div>
   <p id="status"></p>
-  
+
   <script src="script.js"></script>
 </body>
 </html>

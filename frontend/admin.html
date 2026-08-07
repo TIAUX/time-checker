@@ -6,12 +6,14 @@
   <title>Panel de Administración</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
-    body { font-family: sans-serif; max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+    body { font-family: sans-serif; max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
     table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
     th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
     th { background-color: #f2f2f2; }
     video { width: 200px; }
     #map { height: 300px; margin-top: 1rem; display: none; }
+    .entrada { color: blue; font-weight: bold; }
+    .salida  { color: red; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -24,6 +26,7 @@
         <th>Latitud</th>
         <th>Longitud</th>
         <th>Hora del servidor</th>
+        <th>Tipo</th>
         <th>Ver en mapa</th>
       </tr>
     </thead>
@@ -40,7 +43,15 @@
 
     async function cargarEnvíos() {
       try {
-        const res = await fetch('/api/submissions');
+        // El navegador enviará automáticamente las credenciales de Basic Auth
+        const res = await fetch('/api/submissions', {
+          // Si no se usa sesión, incluir credenciales
+          // credentials: 'include' // no necesario con Basic Auth ya que va en el header
+        });
+        if (res.status === 401) {
+          tableBody.innerHTML = '<tr><td colspan="7">Acceso no autorizado. Recarga la página para iniciar sesión.</td></tr>';
+          return;
+        }
         const submissions = await res.json();
         tableBody.innerHTML = '';
 
@@ -54,6 +65,7 @@
             <td>${sub.latitude}</td>
             <td>${sub.longitude}</td>
             <td>${new Date(sub.server_time).toLocaleString()}</td>
+            <td class="${sub.type}">${sub.type.toUpperCase()}</td>
             <td><button data-lat="${sub.latitude}" data-lng="${sub.longitude}">Mostrar</button></td>
           `;
           const btn = row.querySelector('button');
