@@ -78,17 +78,29 @@
     }
 
     function mostrarMapa(lat, lng) {
-      if (!map) {
+    // Mostrar el contenedor primero
+    mapDiv.style.display = 'block';
+
+    if (!map) {
+        // Primera vez: crear mapa en el contenedor visible
         map = L.map('map').setView([lat, lng], 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution: '© OpenStreetMap'
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
         }).addTo(map);
-      }
-      if (marker) map.removeLayer(marker);
-      marker = L.marker([lat, lng]).addTo(map);
-      map.setView([lat, lng], 15);
-      mapDiv.style.display = 'block';
+    } else {
+        // El mapa ya existe; movemos la vista
+        map.setView([lat, lng], 15);
+    }
+
+    // Actualizar o crear marcador
+    if (marker) {
+        map.removeLayer(marker);
+    }
+    marker = L.marker([lat, lng]).addTo(map);
+
+    // Forzar recálculo del tamaño porque el contenedor pudo cambiar
+    map.invalidateSize();
     }
 
     cargarEnvíos();
