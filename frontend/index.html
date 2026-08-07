@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificación de Ubicación</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
+    video { width: 100%; max-width: 480px; background: #000; }
+    button { padding: 0.6rem 1.2rem; font-size: 1rem; margin: 0.5rem 0; }
+    input { padding: 0.5rem; width: 100%; box-sizing: border-box; font-size: 1rem; }
+    .error { color: red; }
+    .success { color: green; }
+  </style>
+</head>
+<body>
+  <h1>Verificación</h1>
+  <label for="name">Tu nombre:</label>
+  <input type="text" id="name" placeholder="Escribe tu nombre" required>
+  <br><br>
+  <video id="preview" autoplay muted></video>
+  <br>
+  <button id="startBtn">Grabar 3 segundos</button>
+  <p id="status"></p>
+  
+  <script src="script.js"></script>
+</body>
+</html>
