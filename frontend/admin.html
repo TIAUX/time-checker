@@ -117,6 +117,43 @@
       box-shadow: 0 8px 20px rgba(0,0,0,0.08);
     }
 
+    .export-panel {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.2rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.8rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+    .export-panel label {
+      font-weight: 500;
+      color: var(--secondary);
+      margin: 0;
+    }
+    .export-panel input[type="date"] {
+      padding: 0.5rem 0.7rem;
+      border: 2px solid var(--accent);
+      border-radius: 8px;
+      background: var(--bg-accent);
+      font-family: inherit;
+    }
+    .export-panel button {
+      background-color: var(--secondary);
+      color: white;
+      border: none;
+      padding: 0.55rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .export-panel button:hover {
+      background-color: var(--primary);
+    }
+
     /* Ajuste para móviles */
     @media (max-width: 600px) {
         h1 {
@@ -144,6 +181,13 @@
 </head>
 <body>
   <h1>Panel de Administración</h1>
+  <div class="export-panel">
+    <label>Desde:</label>
+    <input type="date" id="startDate">
+    <label>Hasta:</label>
+    <input type="date" id="endDate">
+    <button id="exportBtn">📥 Descargar CSV</button>
+  </div>
   <div class="table-container">
     <table id="submissionsTable">
       <thead>
@@ -216,6 +260,17 @@
     }
 
     cargarEnvíos();
+    // Configurar botón de exportación
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const start = document.getElementById('startDate').value;
+      const end = document.getElementById('endDate').value;
+      if (!start || !end) {
+        alert('Selecciona ambas fechas (desde y hasta).');
+        return;
+      }
+      // Descargar archivo
+      window.location.href = `/api/submissions/export?start=${start}&end=${end}`;
+    });
   </script>
 </body>
 </html>
