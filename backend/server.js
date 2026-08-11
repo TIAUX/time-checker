@@ -33,16 +33,18 @@ db.exec(`
     longitude REAL NOT NULL,
     server_time TEXT NOT NULL,
     type TEXT NOT NULL DEFAULT 'entrada',
+    valid INTEGER NOT NULL DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )
 `);
 
-// Migración: agregar columna 'type' si falta
+// Migraciones para columnas agregadas posteriormente
 try {
   db.exec(`ALTER TABLE submissions ADD COLUMN type TEXT NOT NULL DEFAULT 'entrada'`);
-} catch (e) {
-  // La columna ya existe
-}
+} catch (e) { /* ya existe */ }
+try {
+  db.exec(`ALTER TABLE submissions ADD COLUMN valid INTEGER NOT NULL DEFAULT 1`);
+} catch (e) { /* ya existe */ }
 
 // ─── MIDDLEWARE ───────────────────────────────────
 app.use(cors());
@@ -75,7 +77,6 @@ app.get('/api/submissions', authMiddleware, (req, res) => {
 app.get('/api/submissions/export', authMiddleware, (req, res) => {
   try {
     const { start, end } = req.query;
-
     if (!start || !end) {
       return res.status(400).json({ error: 'Se requieren los parámetros start y end (YYYY-MM-DD)' });
     }
@@ -84,16 +85,17 @@ app.get('/api/submissions/export', authMiddleware, (req, res) => {
     const endDate = end + 'T23:59:59.999Z';
 
     const rows = db.prepare(`
-      SELECT name, video_filename, latitude, longitude, server_time, type, created_at
+      SELECT name, video_filename, latitude, longitude, server_time, type, created_at, valid
       FROM submissions
       WHERE server_time >= ? AND server_time <= ?
       ORDER BY server_time ASC
     `).all(startDate, endDate);
 
-    const header = 'Nombre,Latitud,Longitud,Fecha/Hora (servidor),Tipo,Archivo de video\n';
+    const header = 'Nombre,Latitud,Longitud,Fecha/Hora (servidor),Tipo,Archivo de video,Válido\n';
     const csvContent = rows.map(row => {
       const fecha = new Date(row.server_time).toLocaleString('es-MX', { timeZone: 'America/Mexico_City' });
-      return `"${row.name}",${row.latitude},${row.longitude},"${fecha}","${row.type}","${row.video_filename}"`;
+      const valido = row.valid ? 'Sí' : 'No';
+      return `"${row.name}",${row.latitude},${row.longitude},"${fecha}","${row.type}","${row.video_filename}","${valido}"`;
     }).join('\n');
 
     const csv = header + csvContent;
@@ -104,6 +106,23 @@ app.get('/api/submissions/export', authMiddleware, (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al exportar datos' });
+  }
+});
+
+// ─── TOGGLE VALIDEZ ──────────────────────────────
+app.put('/api/submissions/:id/toggle-valid', authMiddleware, (req, res) => {
+  try {
+    const { id } = req.params;
+    const row = db.prepare('SELECT valid FROM submissions WHERE id = ?').get(id);
+    if (!row) {
+      return res.status(404).json({ error: 'Registro no encontrado' });
+    }
+    const newValid = row.valid ? 0 : 1;
+    db.prepare('UPDATE submissions SET valid = ? WHERE id = ?').run(newValid, id);
+    res.json({ success: true, valid: newValid });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al cambiar validez' });
   }
 });
 
@@ -133,7 +152,6 @@ app.post('/api/submit', upload.single('video'), (req, res) => {
     if (!name || !latitude || !longitude || !req.file || !type) {
       return res.status(400).json({ error: 'Faltan datos' });
     }
-
     if (type !== 'entrada' && type !== 'salida') {
       return res.status(400).json({ error: 'Tipo inválido' });
     }
@@ -141,10 +159,9 @@ app.post('/api/submit', upload.single('video'), (req, res) => {
     const videoFilename = req.file.filename;
     const serverTime = new Date().toISOString();
 
-    const stmt = db.prepare(
+    db.prepare(
       'INSERT INTO submissions (name, video_filename, latitude, longitude, server_time, type) VALUES (?, ?, ?, ?, ?, ?)'
-    );
-    stmt.run(name, videoFilename, parseFloat(latitude), parseFloat(longitude), serverTime, type);
+    ).run(name, videoFilename, parseFloat(latitude), parseFloat(longitude), serverTime, type);
 
     res.json({ success: true });
   } catch (error) {

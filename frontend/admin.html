@@ -42,81 +42,6 @@
       font-size: 1.8rem;
     }
 
-    .table-container {
-      width: 100%;
-      overflow-x: auto;
-      background: var(--white);
-      border-radius: 20px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-      margin-bottom: 1.5rem;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 700px;
-    }
-
-    th, td {
-      padding: 0.9rem 0.8rem;
-      text-align: left;
-      border-bottom: 1px solid var(--accent);
-    }
-
-    th {
-      background-color: var(--bg-accent);
-      font-weight: 600;
-      color: var(--secondary);
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    td {
-      font-size: 0.9rem;
-    }
-
-    video {
-    width: 150px;
-    height: auto;
-    border-radius: 8px;
-    background: #000;
-    }
-
-    .entrada {
-      color: var(--primary);
-      font-weight: 700;
-    }
-    .salida {
-      color: #e74c3c;
-      font-weight: 700;
-    }
-
-    button.show-map {
-      background-color: var(--primary);
-      border: none;
-      color: white;
-      padding: 0.45rem 0.8rem;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 500;
-      font-size: 0.85rem;
-      transition: background 0.2s;
-    }
-
-    button.show-map:hover {
-      background-color: var(--secondary);
-    }
-
-    #map {
-      height: 300px;
-      width: 100%;
-      border-radius: 16px;
-      margin-top: 1rem;
-      display: none;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    }
-
     .export-panel {
       background: var(--white);
       border-radius: 16px;
@@ -154,33 +79,136 @@
       background-color: var(--primary);
     }
 
-    /* Ajuste para móviles */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      margin-bottom: 1.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    th, td {
+      padding: 0.9rem 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid var(--accent);
+    }
+
+    th {
+      background-color: var(--bg-accent);
+      font-weight: 600;
+      color: var(--secondary);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      font-size: 0.9rem;
+    }
+
+    video {
+      width: 150px;
+      height: auto;
+      border-radius: 8px;
+      background: #000;
+    }
+
+    .entrada {
+      color: var(--primary);
+      font-weight: 700;
+    }
+    .salida {
+      color: #e74c3c;
+      font-weight: 700;
+    }
+
+    button.show-map {
+      background-color: var(--primary);
+      border: none;
+      color: white;
+      padding: 0.45rem 0.8rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.85rem;
+      transition: background 0.2s;
+    }
+    button.show-map:hover {
+      background-color: var(--secondary);
+    }
+
+    .valid-btn {
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.8rem;
+      transition: background 0.2s;
+    }
+    .valid-btn:hover {
+      background-color: #219a52;
+    }
+
+    .invalid-btn {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.8rem;
+      transition: background 0.2s;
+    }
+    .invalid-btn:hover {
+      background-color: #c0392b;
+    }
+
+    #map {
+      height: 300px;
+      width: 100%;
+      border-radius: 16px;
+      margin-top: 1rem;
+      display: none;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
     @media (max-width: 600px) {
-        h1 {
-            font-size: 1.4rem;
-        }
-        .table-container {
-            border-radius: 12px;
-            /* Aseguramos un scroll horizontal generoso */
-            overflow-x: auto;
-        }
-        th, td {
-            padding: 0.6rem 0.5rem;
-            font-size: 0.8rem;
-        }
-        video {
-            width: 120px;   /* antes era 80px */
-            min-width: 100px;
-        }
-        button.show-map {
-            padding: 0.4rem 0.6rem;
-            font-size: 0.8rem;
-        }
+      h1 {
+        font-size: 1.4rem;
+      }
+      .table-container {
+        border-radius: 12px;
+        overflow-x: auto;
+      }
+      th, td {
+        padding: 0.6rem 0.5rem;
+        font-size: 0.8rem;
+      }
+      video {
+        width: 120px;
+        min-width: 100px;
+      }
+      button.show-map, .valid-btn, .invalid-btn {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+      }
     }
   </style>
 </head>
 <body>
   <h1>Panel de Administración</h1>
+
   <div class="export-panel">
     <label>Desde:</label>
     <input type="date" id="startDate">
@@ -188,6 +216,7 @@
     <input type="date" id="endDate">
     <button id="exportBtn">📥 Descargar CSV</button>
   </div>
+
   <div class="table-container">
     <table id="submissionsTable">
       <thead>
@@ -198,6 +227,7 @@
           <th>Lon.</th>
           <th>Hora servidor</th>
           <th>Tipo</th>
+          <th>Válido</th>
           <th>Mapa</th>
         </tr>
       </thead>
@@ -217,7 +247,7 @@
       try {
         const res = await fetch('/api/submissions');
         if (res.status === 401) {
-          tableBody.innerHTML = '<tr><td colspan="7">Acceso no autorizado. Recarga para iniciar sesión.</td></tr>';
+          tableBody.innerHTML = '<tr><td colspan="8">Acceso no autorizado. Recarga para iniciar sesión.</td></tr>';
           return;
         }
         const submissions = await res.json();
@@ -225,17 +255,75 @@
 
         submissions.forEach(sub => {
           const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${sub.name}</td>
-            <td><video controls src="/uploads/${sub.video_filename}"></video></td>
-            <td>${sub.latitude.toFixed(5)}</td>
-            <td>${sub.longitude.toFixed(5)}</td>
-            <td>${new Date(sub.server_time).toLocaleString()}</td>
-            <td class="${sub.type}">${sub.type.toUpperCase()}</td>
-            <td><button class="show-map" data-lat="${sub.latitude}" data-lng="${sub.longitude}">📍 Ver</button></td>
-          `;
-          const btn = row.querySelector('button.show-map');
-          btn.addEventListener('click', () => mostrarMapa(sub.latitude, sub.longitude));
+
+          // Nombre
+          const tdName = document.createElement('td');
+          tdName.textContent = sub.name;
+          row.appendChild(tdName);
+
+          // Video
+          const tdVideo = document.createElement('td');
+          const video = document.createElement('video');
+          video.controls = true;
+          video.src = `/uploads/${sub.video_filename}`;
+          video.width = 150;
+          tdVideo.appendChild(video);
+          row.appendChild(tdVideo);
+
+          // Latitud
+          const tdLat = document.createElement('td');
+          tdLat.textContent = sub.latitude.toFixed(5);
+          row.appendChild(tdLat);
+
+          // Longitud
+          const tdLon = document.createElement('td');
+          tdLon.textContent = sub.longitude.toFixed(5);
+          row.appendChild(tdLon);
+
+          // Hora servidor
+          const tdTime = document.createElement('td');
+          tdTime.textContent = new Date(sub.server_time).toLocaleString();
+          row.appendChild(tdTime);
+
+          // Tipo
+          const tdType = document.createElement('td');
+          tdType.textContent = sub.type.toUpperCase();
+          tdType.className = sub.type;
+          row.appendChild(tdType);
+
+          // Botón toggle válido/inválido
+          const tdValid = document.createElement('td');
+          const btnValid = document.createElement('button');
+          btnValid.className = sub.valid ? 'valid-btn' : 'invalid-btn';
+          btnValid.textContent = sub.valid ? '✓ Válido' : '✗ Inválido';
+          btnValid.addEventListener('click', async () => {
+            try {
+              const toggleRes = await fetch(`/api/submissions/${sub.id}/toggle-valid`, { method: 'PUT' });
+              const data = await toggleRes.json();
+              if (data.success) {
+                sub.valid = data.valid;
+                btnValid.className = sub.valid ? 'valid-btn' : 'invalid-btn';
+                btnValid.textContent = sub.valid ? '✓ Válido' : '✗ Inválido';
+              } else {
+                alert('Error al cambiar validez');
+              }
+            } catch (err) {
+              console.error(err);
+              alert('Error de conexión');
+            }
+          });
+          tdValid.appendChild(btnValid);
+          row.appendChild(tdValid);
+
+          // Botón mapa
+          const tdMap = document.createElement('td');
+          const btnMap = document.createElement('button');
+          btnMap.className = 'show-map';
+          btnMap.textContent = '📍 Ver';
+          btnMap.addEventListener('click', () => mostrarMapa(sub.latitude, sub.longitude));
+          tdMap.appendChild(btnMap);
+          row.appendChild(tdMap);
+
           tableBody.appendChild(row);
         });
       } catch (err) {
@@ -259,7 +347,6 @@
       map.invalidateSize();
     }
 
-    cargarEnvíos();
     // Configurar botón de exportación
     document.getElementById('exportBtn').addEventListener('click', () => {
       const start = document.getElementById('startDate').value;
@@ -268,9 +355,10 @@
         alert('Selecciona ambas fechas (desde y hasta).');
         return;
       }
-      // Descargar archivo
       window.location.href = `/api/submissions/export?start=${start}&end=${end}`;
     });
+
+    cargarEnvíos();
   </script>
 </body>
 </html>
