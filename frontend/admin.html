@@ -183,6 +183,39 @@
       box-shadow: 0 8px 20px rgba(0,0,0,0.08);
     }
 
+    .pagination-panel {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+      background: var(--white);
+      border-radius: 14px;
+      padding: 1rem 1.2rem;
+      margin: 0 0 1.5rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+      font-size: 0.9rem;
+    }
+    .pagination-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .pagination-controls label { color: var(--secondary); font-weight: 500; }
+    .pagination-controls select,
+    .pagination-controls button {
+      padding: 0.5rem 0.7rem;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--bg-accent);
+      color: var(--text);
+      font: inherit;
+    }
+    .pagination-controls button { cursor: pointer; font-weight: 600; }
+    .pagination-controls button:disabled { opacity: 0.45; cursor: not-allowed; }
+    .pagination-controls button:not(:disabled):hover { background: var(--primary); color: white; }
+
     @media (max-width: 600px) {
       h1 {
         font-size: 1.4rem;
@@ -234,88 +267,121 @@
       <tbody></tbody>
     </table>
   </div>
+  <div class="pagination-panel" aria-label="Paginación de registros">
+    <div id="paginationInfo" aria-live="polite">Cargando registros...</div>
+    <div class="pagination-controls">
+      <label for="pageSize">Registros por página:</label>
+      <select id="pageSize">
+        <option value="25" selected>25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+      <button id="prevPage" type="button" disabled>← Anterior</button>
+      <span id="pageInfo">Página 1 de 1</span>
+      <button id="nextPage" type="button" disabled>Siguiente →</button>
+    </div>
+  </div>
+
   <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     const tableBody = document.querySelector('#submissionsTable tbody');
     const mapDiv = document.getElementById('map');
+    const paginationInfo = document.getElementById('paginationInfo');
+    const pageInfo = document.getElementById('pageInfo');
+    const prevPageBtn = document.getElementById('prevPage');
+    const nextPageBtn = document.getElementById('nextPage');
+    const pageSizeSelect = document.getElementById('pageSize');
     let map = null;
     let marker = null;
+    let currentPage = 1;
+    let pageSize = Number(pageSizeSelect.value);
+    let totalPages = 1;
+    let loading = false;
 
     async function cargarEnvíos() {
+      if (loading) return;
+      loading = true;
+      tableBody.innerHTML = '<tr><td colspan="8">Cargando registros...</td></tr>';
+      prevPageBtn.disabled = true;
+      nextPageBtn.disabled = true;
+
       try {
-        const res = await fetch('/api/submissions');
+        const res = await fetch(`/api/submissions?page=${currentPage}&limit=${pageSize}`);
         if (res.status === 401) {
           tableBody.innerHTML = '<tr><td colspan="8">Acceso no autorizado. Recarga para iniciar sesión.</td></tr>';
+          paginationInfo.textContent = 'Sesión no autorizada';
           return;
         }
-        const submissions = await res.json();
+        if (!res.ok) throw new Error('No se pudieron cargar los registros');
+        const result = await res.json();
+        const submissions = result.data;
+        const pagination = result.pagination;
+        currentPage = pagination.page;
+        totalPages = Math.max(1, pagination.totalPages);
+
         tableBody.innerHTML = '';
+        if (submissions.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="8">No hay registros para mostrar.</td></tr>';
+        }
 
         submissions.forEach(sub => {
           const row = document.createElement('tr');
 
-          // Nombre
           const tdName = document.createElement('td');
           tdName.textContent = sub.name;
           row.appendChild(tdName);
 
-          // Video
           const tdVideo = document.createElement('td');
           const video = document.createElement('video');
           video.controls = true;
+          video.preload = 'none';
           video.src = `/uploads/${sub.video_filename}`;
           video.width = 150;
           tdVideo.appendChild(video);
           row.appendChild(tdVideo);
 
-          // Latitud
           const tdLat = document.createElement('td');
-          tdLat.textContent = sub.latitude.toFixed(5);
+          tdLat.textContent = Number(sub.latitude).toFixed(5);
           row.appendChild(tdLat);
 
-          // Longitud
           const tdLon = document.createElement('td');
-          tdLon.textContent = sub.longitude.toFixed(5);
+          tdLon.textContent = Number(sub.longitude).toFixed(5);
           row.appendChild(tdLon);
 
-          // Hora servidor
           const tdTime = document.createElement('td');
           tdTime.textContent = new Date(sub.server_time).toLocaleString();
           row.appendChild(tdTime);
 
-          // Tipo
           const tdType = document.createElement('td');
-          tdType.textContent = sub.type.toUpperCase();
+          tdType.textContent = String(sub.type || '').toUpperCase();
           tdType.className = sub.type;
           row.appendChild(tdType);
 
-          // Botón toggle válido/inválido
           const tdValid = document.createElement('td');
           const btnValid = document.createElement('button');
           btnValid.className = sub.valid ? 'valid-btn' : 'invalid-btn';
           btnValid.textContent = sub.valid ? '✓ Válido' : '✗ Inválido';
           btnValid.addEventListener('click', async () => {
+            btnValid.disabled = true;
             try {
               const toggleRes = await fetch(`/api/submissions/${sub.id}/toggle-valid`, { method: 'PUT' });
               const data = await toggleRes.json();
-              if (data.success) {
-                sub.valid = data.valid;
-                btnValid.className = sub.valid ? 'valid-btn' : 'invalid-btn';
-                btnValid.textContent = sub.valid ? '✓ Válido' : '✗ Inválido';
-              } else {
-                alert('Error al cambiar validez');
-              }
+              if (!toggleRes.ok || !data.success) throw new Error('No se pudo cambiar la validez');
+              sub.valid = data.valid;
+              btnValid.className = sub.valid ? 'valid-btn' : 'invalid-btn';
+              btnValid.textContent = sub.valid ? '✓ Válido' : '✗ Inválido';
             } catch (err) {
               console.error(err);
-              alert('Error de conexión');
+              alert('No se pudo cambiar la validez. Intenta de nuevo.');
+            } finally {
+              btnValid.disabled = false;
             }
           });
           tdValid.appendChild(btnValid);
           row.appendChild(tdValid);
 
-          // Botón mapa
           const tdMap = document.createElement('td');
           const btnMap = document.createElement('button');
           btnMap.className = 'show-map';
@@ -326,10 +392,39 @@
 
           tableBody.appendChild(row);
         });
+
+        const firstRecord = pagination.total === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+        const lastRecord = Math.min(currentPage * pageSize, pagination.total);
+        paginationInfo.textContent = `Mostrando ${firstRecord}-${lastRecord} de ${pagination.total} registros`;
+        pageInfo.textContent = `Página ${currentPage} de ${totalPages}`;
+        prevPageBtn.disabled = currentPage <= 1;
+        nextPageBtn.disabled = currentPage >= totalPages;
       } catch (err) {
         console.error(err);
+        tableBody.innerHTML = '<tr><td colspan="8">Error al cargar los registros. Intenta de nuevo.</td></tr>';
+        paginationInfo.textContent = 'Error de carga';
+      } finally {
+        loading = false;
       }
     }
+
+    prevPageBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        cargarEnvíos();
+      }
+    });
+    nextPageBtn.addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        cargarEnvíos();
+      }
+    });
+    pageSizeSelect.addEventListener('change', () => {
+      pageSize = Number(pageSizeSelect.value);
+      currentPage = 1;
+      cargarEnvíos();
+    });
 
     function mostrarMapa(lat, lng) {
       mapDiv.style.display = 'block';

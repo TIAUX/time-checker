@@ -65,8 +65,27 @@ app.get('/admin', authMiddleware, (req, res) => {
 // API de envíos protegida
 app.get('/api/submissions', authMiddleware, (req, res) => {
   try {
-    const rows = db.prepare('SELECT * FROM submissions ORDER BY created_at DESC').all();
-    res.json(rows);
+    // Paginación en el servidor: solo se consultan los registros de la página solicitada.
+    const page = Math.max(1, Number.parseInt(req.query.page, 10) || 1);
+    const allowedPageSizes = [25, 50, 100];
+    const requestedLimit = Number.parseInt(req.query.limit, 10) || 25;
+    const limit = allowedPageSizes.includes(requestedLimit) ? requestedLimit : 25;
+    const offset = (page - 1) * limit;
+
+    const total = db.prepare('SELECT COUNT(*) AS total FROM submissions').get().total;
+    const rows = db.prepare(
+      'SELECT * FROM submissions ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?'
+    ).all(limit, offset);
+
+    res.json({
+      data: rows,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al obtener datos' });
